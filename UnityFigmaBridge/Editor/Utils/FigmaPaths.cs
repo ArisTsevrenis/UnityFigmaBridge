@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 using UnityFigmaBridge.Editor.FigmaApi;
 
 namespace UnityFigmaBridge.Editor.Utils
@@ -31,23 +35,25 @@ namespace UnityFigmaBridge.Editor.Utils
         /// Asset folder to store server rendered images
         /// </summary>
         public static string FigmaServerRenderedImagesFolder = $"{FigmaAssetsRootFolder}/ServerRenderedImages";
-        
+
         /// <summary>
         /// Asset folder to store Font material presets
         /// </summary>
         public static string FigmaFontMaterialPresetsFolder = $"{FigmaAssetsRootFolder}/FontMaterialPresets";
-        
+
         /// <summary>
         /// Asset folder to store Font assets (TTF and generated TMP fonts)
         /// </summary>
         public static string FigmaFontsFolder = $"{FigmaAssetsRootFolder}/Fonts";
-        
-        
+
+        /// <summary>Is invoked before deleting a file that represets a screen-prefab</summary>
+        public static event Action<FileInfo> OnPrefabScreenFileDeletion;
+
         public static string GetPathForImageFill(string imageId)
         {
             return $"{FigmaPaths.FigmaImageFillFolder}/{imageId}.png";
         }
-        
+
         public static string GetPathForServerRenderedImage(string nodeId,
             List<ServerRenderNodeData> serverRenderNodeData)
         {
@@ -59,31 +65,31 @@ namespace UnityFigmaBridge.Editor.Utils
                 default:
                     var safeNodeId = FigmaDataUtils.ReplaceUnsafeFileCharactersForNodeId(nodeId);
                     return $"{FigmaPaths.FigmaServerRenderedImagesFolder}/{safeNodeId}.png";
-                   
+
             }
         }
 
-        public static string GetPathForScreenPrefab(Node node,int duplicateCount)
+        public static string GetPathForScreenPrefab(Node node, int duplicateCount)
         {
-            return $"{FigmaScreenPrefabFolder}/{GetFileNameForNode(node,duplicateCount)}.prefab";
+            return $"{FigmaScreenPrefabFolder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
         }
-        
-        public static string GetPathForPagePrefab(Node node,int duplicateCount)
+
+        public static string GetPathForPagePrefab(Node node, int duplicateCount)
         {
-            return $"{FigmaPagePrefabFolder}/{GetFileNameForNode(node,duplicateCount)}.prefab";
+            return $"{FigmaPagePrefabFolder}/{GetFileNameForNode(node, duplicateCount)}.prefab";
         }
-        
-        public static string GetPathForComponentPrefab(string nodeName,int duplicateCount)
+
+        public static string GetPathForComponentPrefab(string nodeName, int duplicateCount)
         {
             // If name already used, create a unique name
             if (duplicateCount > 0) nodeName += $"_{duplicateCount}";
             nodeName = ReplaceUnsafeCharacters(nodeName);
             return $"{FigmaComponentPrefabFolder}/{nodeName}.prefab";
         }
-        
-        public static string GetFileNameForNode(Node node,int duplicateCount)
+
+        public static string GetFileNameForNode(Node node, int duplicateCount)
         {
-            var safeNodeTitle=ReplaceUnsafeCharacters(node.name);
+            var safeNodeTitle = ReplaceUnsafeCharacters(node.name);
             // If name already used, create a unique name
             if (duplicateCount > 0) safeNodeTitle += $"_{duplicateCount}";
             return safeNodeTitle;
@@ -93,23 +99,23 @@ namespace UnityFigmaBridge.Editor.Utils
         {
             // We want to trim spaces from start and end of filename, or we'll throw an error
             // We no longer want to use the final "/" character as this might be used by the user
-            var safeFilename=inputFilename.Trim();
+            var safeFilename = inputFilename.Trim();
             return MakeValidFileName(safeFilename);
         }
-        
+
         // From https://www.csharp-console-examples.com/general/c-replace-invalid-filename-characters/
         public static string MakeValidFileName(string name)
         {
             string invalidChars = System.Text.RegularExpressions.Regex.Escape(new string(Path.GetInvalidFileNameChars()));
             invalidChars += ".";
             string invalidRegStr = string.Format(@"([{0}]*\.+$)|([{0}]+)", invalidChars);
- 
+
             return System.Text.RegularExpressions.Regex.Replace(name, invalidRegStr, "_");
         }
 
         public static void CreateRequiredDirectories()
         {
-            
+
             //  Create directory for pages if required 
             if (!Directory.Exists(FigmaPagePrefabFolder))
             {
@@ -117,33 +123,35 @@ namespace UnityFigmaBridge.Editor.Utils
             }
 
             // Remove existing prefabs for pages
-            foreach (var file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(FigmaPagePrefabFolder).GetFiles())
             {
-                file.Delete(); 
+                file.Delete();
             }
-            
+
             //  Create directory for flowScreen prefabs if required 
             if (!Directory.Exists(FigmaScreenPrefabFolder))
             {
                 Directory.CreateDirectory(FigmaScreenPrefabFolder);
             }
+
             // Remove existing flowScreen prefabs
-            foreach (FileInfo file in  new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(FigmaScreenPrefabFolder).GetFiles())
             {
-                file.Delete(); 
+                OnPrefabScreenFileDeletion?.Invoke(file);
+                file.Delete();
             }
-            
+
             if (!Directory.Exists(FigmaComponentPrefabFolder))
             {
                 Directory.CreateDirectory(FigmaComponentPrefabFolder);
             }
-            
+
             //  Create directory for image fills if required 
             if (!Directory.Exists(FigmaImageFillFolder))
             {
                 Directory.CreateDirectory(FigmaImageFillFolder);
             }
-            
+
             //  Create directory for server rendered images if required 
             if (!Directory.Exists(FigmaServerRenderedImagesFolder))
             {
@@ -154,12 +162,12 @@ namespace UnityFigmaBridge.Editor.Utils
             {
                 Directory.CreateDirectory(FigmaFontMaterialPresetsFolder);
             }
-            
+
             if (!Directory.Exists(FigmaFontsFolder))
             {
                 Directory.CreateDirectory(FigmaFontsFolder);
             }
         }
-        
+
     }
 }
