@@ -275,13 +275,21 @@ namespace UnityFigmaBridge.Editor.FigmaApi
         {
             NONE,
             HORIZONTAL,
-            VERTICAL,
+            VERTICAL
         }
 
         /// <summary>
         /// Whether this layer uses auto-layout to position its children
         /// </summary>
-        public LayoutMode layoutMode=LayoutMode.NONE;
+        public LayoutMode layoutMode = LayoutMode.NONE;
+
+		public enum LayoutWrap
+		{
+			NO_WRAP,
+			WRAP,
+		}
+
+		public LayoutWrap layoutWrap = LayoutWrap.NO_WRAP;
 
         public enum PrimaryAxisSizingMode
         {

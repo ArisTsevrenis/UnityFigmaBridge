@@ -67,6 +67,7 @@ namespace UnityFigmaBridge.Editor
         
         private static async void SyncAsync()
         {
+			Debug.Log("Syncing Documents");
             var requirementsMet = CheckRequirements();
             if (!requirementsMet) return;
 

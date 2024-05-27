@@ -81,6 +81,16 @@ namespace UnityFigmaBridge.Editor.Nodes
             switch (node.layoutMode)
             {
                 case Node.LayoutMode.VERTICAL:
+
+					if(node.layoutWrap == Node.LayoutWrap.WRAP)
+					{
+						Debug.Log("I find a wrap mode");
+					}
+					else if (node.layoutWrap == Node.LayoutWrap.NO_WRAP)
+					{
+						Debug.Log("I find a no wrap mode");
+					}
+
                     layoutGroup= UnityUiUtils.GetOrAddComponent<VerticalLayoutGroup>(targetLayoutObject);
                     layoutGroup.childForceExpandWidth= layoutGroup.childForceExpandHeight = false;
                     // Setup alignment according to Figma layout. Primary is Vertical
@@ -122,6 +132,16 @@ namespace UnityFigmaBridge.Editor.Nodes
 
                     break;
                 case Node.LayoutMode.HORIZONTAL:
+
+					if(node.layoutWrap == Node.LayoutWrap.WRAP)
+					{
+						Debug.Log("I find a wrap mode");
+					}
+					else if (node.layoutWrap == Node.LayoutWrap.NO_WRAP)
+					{
+						Debug.Log("I find a no wrap mode");
+					}
+
                     layoutGroup= UnityUiUtils.GetOrAddComponent<HorizontalLayoutGroup>(targetLayoutObject);
                     layoutGroup.childForceExpandWidth= layoutGroup.childForceExpandHeight = false;
                     // Setup alignment according to Figma layout. Primary is Horizontal
