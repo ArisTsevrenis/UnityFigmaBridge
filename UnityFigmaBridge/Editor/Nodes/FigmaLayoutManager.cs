@@ -21,7 +21,6 @@ namespace UnityFigmaBridge.Editor.Nodes
         public static void ApplyLayoutPropertiesForNode( GameObject nodeGameObject,Node node,
             FigmaImportProcessData figmaImportProcessData,out GameObject scrollContentGameObject)
         {
-            
             // Depending on whether scrolling is applied, we may want to add layout to this object or to the content
             // holder
             
@@ -73,118 +72,149 @@ namespace UnityFigmaBridge.Editor.Nodes
             if (node.layoutMode == Node.LayoutMode.NONE || !figmaImportProcessData.Settings.EnableAutoLayout) return;
             
             // Remove an existing layout group if it exists
-            var existingLayoutGroup = targetLayoutObject.GetComponent<HorizontalOrVerticalLayoutGroup>();
+            var existingLayoutGroup = targetLayoutObject.GetComponent<LayoutGroup>();
             if (existingLayoutGroup!=null) UnityEngine.Object.DestroyImmediate(existingLayoutGroup);
             
-            HorizontalOrVerticalLayoutGroup layoutGroup = null;
-            
-            switch (node.layoutMode)
-            {
-                case Node.LayoutMode.VERTICAL:
+            LayoutGroup layoutGroup = null;
 
-					if(node.layoutWrap == Node.LayoutWrap.WRAP)
-					{
-						Debug.Log("I find a wrap mode");
-					}
-					else if (node.layoutWrap == Node.LayoutWrap.NO_WRAP)
-					{
-						Debug.Log("I find a no wrap mode");
-					}
-
-                    layoutGroup= UnityUiUtils.GetOrAddComponent<VerticalLayoutGroup>(targetLayoutObject);
-                    layoutGroup.childForceExpandWidth= layoutGroup.childForceExpandHeight = false;
-                    // Setup alignment according to Figma layout. Primary is Vertical
-                    switch (node.primaryAxisAlignItems)
-                    {
-                        // Upper Alignment
-                        case Node.PrimaryAxisAlignItems.MIN:
-                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
-                            {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
-                                _ => layoutGroup.childAlignment
-                            };
-                            break;
-                        // Center alignment
-                        case Node.PrimaryAxisAlignItems.CENTER:
-                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
-                            {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.MiddleLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.MiddleRight,
-                                _ => layoutGroup.childAlignment
-                            };
-                            break;
-                        // Lower alignment
-                        case Node.PrimaryAxisAlignItems.MAX:
-                            layoutGroup.childAlignment = node.counterAxisAlignItems switch
-                            {
-                                Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
-                                Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
-                                Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
-                                _ => layoutGroup.childAlignment
-                            };
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-
-                    break;
-                case Node.LayoutMode.HORIZONTAL:
-
-					if(node.layoutWrap == Node.LayoutWrap.WRAP)
-					{
-						Debug.Log("I find a wrap mode");
-					}
-					else if (node.layoutWrap == Node.LayoutWrap.NO_WRAP)
-					{
-						Debug.Log("I find a no wrap mode");
-					}
-
-                    layoutGroup= UnityUiUtils.GetOrAddComponent<HorizontalLayoutGroup>(targetLayoutObject);
-                    layoutGroup.childForceExpandWidth= layoutGroup.childForceExpandHeight = false;
-                    // Setup alignment according to Figma layout. Primary is Horizontal
-                    layoutGroup.childAlignment = node.primaryAxisAlignItems switch
-                    {
-                        // Left Alignment
-                        Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
+			if( node.layoutMode == Node.LayoutMode.VERTICAL && node.layoutWrap == Node.LayoutWrap.NO_WRAP )
+			{
+				layoutGroup = UnityUiUtils.GetOrAddComponent<VerticalLayoutGroup>(targetLayoutObject);
+				var hvLayoutGroup = (HorizontalOrVerticalLayoutGroup)layoutGroup;
+                hvLayoutGroup.childForceExpandWidth = hvLayoutGroup.childForceExpandHeight = false;
+                // Setup alignment according to Figma layout. Primary is Vertical
+                switch (node.primaryAxisAlignItems)
+                {
+                    // Upper Alignment
+                    case Node.PrimaryAxisAlignItems.MIN:
+                        layoutGroup.childAlignment = node.counterAxisAlignItems switch
                         {
                             Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
+                            Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
+                            Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
                             _ => layoutGroup.childAlignment
-                        },
-                        // Center alignment
-                        Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
+                        };
+                        break;
+                    // Center alignment
+                    case Node.PrimaryAxisAlignItems.CENTER:
+                        layoutGroup.childAlignment = node.counterAxisAlignItems switch
                         {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
+                            Node.CounterAxisAlignItems.MIN => TextAnchor.MiddleLeft,
                             Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
+                            Node.CounterAxisAlignItems.MAX => TextAnchor.MiddleRight,
                             _ => layoutGroup.childAlignment
-                        },
-                        // Right alignment
-                        Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
+                        };
+                        break;
+                    // Lower alignment
+                    case Node.PrimaryAxisAlignItems.MAX:
+                        layoutGroup.childAlignment = node.counterAxisAlignItems switch
                         {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
+                            Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
+                            Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
                             Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
                             _ => layoutGroup.childAlignment
-                        },
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-                    break;
-            }
+                        };
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+			}
+			else if( node.layoutMode == Node.LayoutMode.HORIZONTAL && node.layoutWrap == Node.LayoutWrap.NO_WRAP )
+			{
+				layoutGroup= UnityUiUtils.GetOrAddComponent<HorizontalLayoutGroup>(targetLayoutObject);
+				var hvLayoutGroup = (HorizontalOrVerticalLayoutGroup)layoutGroup;
+                hvLayoutGroup.childForceExpandWidth = hvLayoutGroup.childForceExpandHeight = false;
+                // Setup alignment according to Figma layout. Primary is Horizontal
+                layoutGroup.childAlignment = node.primaryAxisAlignItems switch
+                {
+                    // Left Alignment
+                    Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
+                    {
+                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
+                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
+                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
+                        _ => layoutGroup.childAlignment
+                    },
+                    // Center alignment
+                    Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
+                    {
+                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
+                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
+                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
+                        _ => layoutGroup.childAlignment
+                    },
+                    // Right alignment
+                    Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
+                    {
+                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
+                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
+                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                        _ => layoutGroup.childAlignment
+                    },
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+			}
+			else if( node.layoutWrap == Node.LayoutWrap.WRAP )
+			{
+				layoutGroup= UnityUiUtils.GetOrAddComponent<GridLayoutGroup>(targetLayoutObject);
+                // Setup alignment according to Figma layout. Primary is Horizontal
+                layoutGroup.childAlignment = node.primaryAxisAlignItems switch
+                {
+                    // Left Alignment
+                    Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
+                    {
+                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
+                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
+                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
+                        _ => layoutGroup.childAlignment
+                    },
+                    // Center alignment
+                    Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
+                    {
+                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
+                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
+                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
+                        _ => layoutGroup.childAlignment
+                    },
+                    // Right alignment
+                    Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
+                    {
+                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
+                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
+                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+                        _ => layoutGroup.childAlignment
+                    },
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+			}
+			else
+			{
+				//Error
+			}
 
-            layoutGroup.childControlHeight = true;
-            layoutGroup.childControlWidth = true;
-            layoutGroup.childForceExpandHeight = false;
-            layoutGroup.childForceExpandWidth = false;
-            layoutGroup.childAlignment = TextAnchor.MiddleCenter;
+			if ( layoutGroup is HorizontalOrVerticalLayoutGroup hvLayout)
+			{
+				hvLayout.childControlHeight = true;
+				hvLayout.childControlWidth = true;
+				hvLayout.childForceExpandHeight = false;
+				hvLayout.childForceExpandWidth = false;
 
-            layoutGroup.padding = new RectOffset(Mathf.RoundToInt(node.paddingLeft), Mathf.RoundToInt(node.paddingRight),
-                Mathf.RoundToInt(node.paddingTop), Mathf.RoundToInt(node.paddingBottom));
-            layoutGroup.spacing = node.itemSpacing;
+				hvLayout.spacing = node.itemSpacing;
+			}
+			else if (layoutGroup is GridLayoutGroup gridLayout)
+			{
+				gridLayout.spacing = new Vector2( node.itemSpacing, node.itemSpacing );
+				
+				if(node.children != null && node.children.Length > 0)
+				{
+					Vector2 cellSize = new Vector2(node.children[0].size.x, node.children[0].size.y);
+					gridLayout.cellSize = cellSize;
+				}
+			}
+
+			layoutGroup.childAlignment = TextAnchor.MiddleCenter;
+			layoutGroup.padding = new RectOffset(Mathf.RoundToInt(node.paddingLeft), Mathf.RoundToInt(node.paddingRight),
+				Mathf.RoundToInt(node.paddingTop), Mathf.RoundToInt(node.paddingBottom));
         }
     }
 }
