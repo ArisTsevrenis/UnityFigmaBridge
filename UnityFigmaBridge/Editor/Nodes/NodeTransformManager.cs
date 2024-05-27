@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityFigmaBridge.Editor.FigmaApi;
+using UnityFigmaBridge.Editor.Utils;
 
 namespace UnityFigmaBridge.Editor.Nodes
 {
@@ -48,7 +49,9 @@ namespace UnityFigmaBridge.Editor.Nodes
             targetRectTransform.sizeDelta = new Vector2(figmaNode.size.x, figmaNode.size.y);
 
             //Add a layout element and set its preferred size
-            LayoutElement layoutElement = targetRectTransform.gameObject.AddComponent<LayoutElement>();
+			
+            LayoutElement layoutElement = UnityUiUtils.GetOrAddComponent<LayoutElement>(targetRectTransform.gameObject);
+			
             layoutElement.preferredWidth = figmaNode.size.x;
             layoutElement.preferredHeight = figmaNode.size.y;
 
@@ -144,7 +147,7 @@ namespace UnityFigmaBridge.Editor.Nodes
             targetRectTransform.sizeDelta = new Vector2(figmaNode.absoluteBoundingBox.width, figmaNode.absoluteBoundingBox.height);
 
             //Add a layout element and set its preferred size
-            LayoutElement layoutElement = targetRectTransform.gameObject.AddComponent<LayoutElement>();
+            LayoutElement layoutElement = UnityUiUtils.GetOrAddComponent<LayoutElement>(targetRectTransform.gameObject);
             layoutElement.preferredWidth = figmaNode.absoluteBoundingBox.width;
             layoutElement.preferredHeight = figmaNode.absoluteBoundingBox.height;
 
