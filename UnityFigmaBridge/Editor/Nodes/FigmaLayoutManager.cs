@@ -82,110 +82,16 @@ namespace UnityFigmaBridge.Editor.Nodes
 				layoutGroup = UnityUiUtils.GetOrAddComponent<VerticalLayoutGroup>(targetLayoutObject);
 				var hvLayoutGroup = (HorizontalOrVerticalLayoutGroup)layoutGroup;
                 hvLayoutGroup.childForceExpandWidth = hvLayoutGroup.childForceExpandHeight = false;
-                // Setup alignment according to Figma layout. Primary is Vertical
-                switch (node.primaryAxisAlignItems)
-                {
-                    // Upper Alignment
-                    case Node.PrimaryAxisAlignItems.MIN:
-                        layoutGroup.childAlignment = node.counterAxisAlignItems switch
-                        {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.UpperCenter,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.UpperRight,
-                            _ => layoutGroup.childAlignment
-                        };
-                        break;
-                    // Center alignment
-                    case Node.PrimaryAxisAlignItems.CENTER:
-                        layoutGroup.childAlignment = node.counterAxisAlignItems switch
-                        {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.MiddleLeft,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.MiddleRight,
-                            _ => layoutGroup.childAlignment
-                        };
-                        break;
-                    // Lower alignment
-                    case Node.PrimaryAxisAlignItems.MAX:
-                        layoutGroup.childAlignment = node.counterAxisAlignItems switch
-                        {
-                            Node.CounterAxisAlignItems.MIN => TextAnchor.LowerLeft,
-                            Node.CounterAxisAlignItems.CENTER => TextAnchor.LowerCenter,
-                            Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
-                            _ => layoutGroup.childAlignment
-                        };
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
 			}
 			else if( node.layoutMode == Node.LayoutMode.HORIZONTAL && node.layoutWrap == Node.LayoutWrap.NO_WRAP )
 			{
 				layoutGroup= UnityUiUtils.GetOrAddComponent<HorizontalLayoutGroup>(targetLayoutObject);
 				var hvLayoutGroup = (HorizontalOrVerticalLayoutGroup)layoutGroup;
                 hvLayoutGroup.childForceExpandWidth = hvLayoutGroup.childForceExpandHeight = false;
-                // Setup alignment according to Figma layout. Primary is Horizontal
-                layoutGroup.childAlignment = node.primaryAxisAlignItems switch
-                {
-                    // Left Alignment
-                    Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
-                    {
-                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
-                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
-                        _ => layoutGroup.childAlignment
-                    },
-                    // Center alignment
-                    Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
-                    {
-                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
-                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
-                        _ => layoutGroup.childAlignment
-                    },
-                    // Right alignment
-                    Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
-                    {
-                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
-                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
-                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
-                        _ => layoutGroup.childAlignment
-                    },
-                    _ => throw new ArgumentOutOfRangeException()
-                };
 			}
 			else if( node.layoutWrap == Node.LayoutWrap.WRAP )
 			{
 				layoutGroup= UnityUiUtils.GetOrAddComponent<GridLayoutGroup>(targetLayoutObject);
-                // Setup alignment according to Figma layout. Primary is Horizontal
-                layoutGroup.childAlignment = node.primaryAxisAlignItems switch
-                {
-                    // Left Alignment
-                    Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
-                    {
-                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
-                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
-                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
-                        _ => layoutGroup.childAlignment
-                    },
-                    // Center alignment
-                    Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
-                    {
-                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
-                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
-                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
-                        _ => layoutGroup.childAlignment
-                    },
-                    // Right alignment
-                    Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
-                    {
-                        Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
-                        Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
-                        Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
-                        _ => layoutGroup.childAlignment
-                    },
-                    _ => throw new ArgumentOutOfRangeException()
-                };
 			}
 			else
 			{
@@ -212,7 +118,36 @@ namespace UnityFigmaBridge.Editor.Nodes
 				}
 			}
 
-			layoutGroup.childAlignment = TextAnchor.MiddleCenter;
+			// Setup alignment according to Figma layout. Primary is Horizontal
+			layoutGroup.childAlignment = node.primaryAxisAlignItems switch
+			{
+				// Left Alignment
+				Node.PrimaryAxisAlignItems.MIN => node.counterAxisAlignItems switch
+				{
+					Node.CounterAxisAlignItems.MIN => TextAnchor.UpperLeft,
+					Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleLeft,
+					Node.CounterAxisAlignItems.MAX => TextAnchor.LowerLeft,
+					_ => layoutGroup.childAlignment
+				},
+				// Center alignment
+				Node.PrimaryAxisAlignItems.CENTER => node.counterAxisAlignItems switch
+				{
+					Node.CounterAxisAlignItems.MIN => TextAnchor.UpperCenter,
+					Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleCenter,
+					Node.CounterAxisAlignItems.MAX => TextAnchor.LowerCenter,
+					_ => layoutGroup.childAlignment
+				},
+				// Right alignment
+				Node.PrimaryAxisAlignItems.MAX => node.counterAxisAlignItems switch
+				{
+					Node.CounterAxisAlignItems.MIN => TextAnchor.UpperRight,
+					Node.CounterAxisAlignItems.CENTER => TextAnchor.MiddleRight,
+					Node.CounterAxisAlignItems.MAX => TextAnchor.LowerRight,
+					_ => layoutGroup.childAlignment
+				},
+				_ => throw new ArgumentOutOfRangeException()
+			};
+
 			layoutGroup.padding = new RectOffset(Mathf.RoundToInt(node.paddingLeft), Mathf.RoundToInt(node.paddingRight),
 				Mathf.RoundToInt(node.paddingTop), Mathf.RoundToInt(node.paddingBottom));
         }
