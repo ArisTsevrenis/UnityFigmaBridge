@@ -15,7 +15,7 @@ namespace UnityFigmaBridge.Editor.PrototypeFlow
     {
 
 
-        private const int MAX_SEARCH_DEPTH_FOR_TRANSFORMS = 3;
+        private const int MAX_SEARCH_DEPTH_FOR_TRANSFORMS = 9;
         
         /// <summary>
         /// Attempts to find a suitable mono behaviour to bind
